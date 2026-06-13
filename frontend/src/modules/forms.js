@@ -31,6 +31,7 @@ export const projectFields = [
   { name: "start_date", label: "Start date", type: "date" },
   { name: "expected_finish", label: "Expected finish", type: "date" },
   { name: "risk_level", label: "Risk", type: "select", options: ["low", "medium", "high"] },
+  { name: "budget", label: "Budget (Contract amount)", type: "number" },
   { name: "latest_update", label: "Latest update", type: "textarea" },
 ];
 
@@ -54,4 +55,13 @@ export const inspectionFields = [
   { name: "inspector", label: "Inspector", type: "text" },
   { name: "result", label: "Result", type: "select", options: ["pending", "passed", "整改", "failed"] },
   { name: "issues", label: "Issues", type: "textarea" },
+];
+
+export const paymentFields = [
+  { name: "project_id", label: "Project ID", type: "number" },
+  { name: "project_name", label: "Project", type: "text" },
+  { name: "amount", label: "Amount", type: "number" },
+  { name: "payment_date", label: "Payment date", type: "date" },
+  { name: "status", label: "Status", type: "select", options: ["pending", "received", "partial", "overdue"] },
+  { name: "notes", label: "Notes", type: "textarea" },
 ];

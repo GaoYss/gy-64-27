@@ -1,4 +1,5 @@
 import {
+  Banknote,
   CalendarCheck,
   ClipboardCheck,
   Gauge,
@@ -14,4 +15,5 @@ export const MODULES = [
   { id: "projects", label: "Construction", icon: Hammer },
   { id: "procurement", label: "Procurement", icon: PackageCheck },
   { id: "inspections", label: "Acceptance", icon: ClipboardCheck },
+  { id: "payments", label: "Payments", icon: Banknote },
 ];

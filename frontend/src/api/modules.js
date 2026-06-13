@@ -18,6 +18,7 @@ export const appointmentApi = {
 
 export const projectApi = {
   list: () => api.get("/projects"),
+  costSummary: () => api.get("/projects/cost-summary"),
   create: (payload) => api.post("/projects", payload),
   update: (id, payload) => api.patch(`/projects/${id}`, payload),
 };
@@ -32,4 +33,10 @@ export const inspectionApi = {
   list: () => api.get("/inspections"),
   create: (payload) => api.post("/inspections", payload),
   update: (id, payload) => api.patch(`/inspections/${id}`, payload),
+};
+
+export const paymentApi = {
+  list: () => api.get("/payments"),
+  create: (payload) => api.post("/payments", payload),
+  update: (id, payload) => api.patch(`/payments/${id}`, payload),
 };

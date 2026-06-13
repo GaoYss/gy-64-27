@@ -5,6 +5,7 @@ import {
   customerApi,
   dashboardApi,
   inspectionApi,
+  paymentApi,
   procurementApi,
   projectApi,
 } from "../api/modules.js";
@@ -17,6 +18,7 @@ const apiMap = {
   projects: projectApi,
   procurements: procurementApi,
   inspections: inspectionApi,
+  payments: paymentApi,
 };
 
 export function AppProvider({ children }) {
@@ -27,6 +29,8 @@ export function AppProvider({ children }) {
     projects: [],
     procurements: [],
     inspections: [],
+    payments: [],
+    projectCosts: [],
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,15 +39,27 @@ export function AppProvider({ children }) {
     setLoading(true);
     setError("");
     try {
-      const [dashboard, customers, appointments, projects, procurements, inspections] = await Promise.all([
-        dashboardApi.summary(),
-        customerApi.list(),
-        appointmentApi.list(),
-        projectApi.list(),
-        procurementApi.list(),
-        inspectionApi.list(),
-      ]);
-      setState({ dashboard, customers, appointments, projects, procurements, inspections });
+      const [dashboard, customers, appointments, projects, procurements, inspections, payments, projectCosts] =
+        await Promise.all([
+          dashboardApi.summary(),
+          customerApi.list(),
+          appointmentApi.list(),
+          projectApi.list(),
+          procurementApi.list(),
+          inspectionApi.list(),
+          paymentApi.list(),
+          projectApi.costSummary(),
+        ]);
+      setState({
+        dashboard,
+        customers,
+        appointments,
+        projects,
+        procurements,
+        inspections,
+        payments,
+        projectCosts,
+      });
     } catch (err) {
       setError(err.message);
     } finally {

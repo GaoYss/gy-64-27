@@ -18,6 +18,7 @@ class ProjectBase(BaseModel):
     expected_finish: date
     risk_level: RiskLevel = "low"
     latest_update: str = ""
+    budget: float = Field(ge=0, default=0)
 
 
 class ProjectCreate(ProjectBase):
@@ -34,7 +35,19 @@ class ProjectUpdate(BaseModel):
     expected_finish: date | None = None
     risk_level: RiskLevel | None = None
     latest_update: str | None = None
+    budget: float | None = Field(default=None, ge=0)
 
 
 class Project(ProjectBase):
     id: int
+
+
+class ProjectCostSummary(BaseModel):
+    project_id: int
+    project_name: str
+    customer_name: str
+    budget: float
+    procurement_total: float
+    payment_received: float
+    gross_profit: float
+    gross_margin: float

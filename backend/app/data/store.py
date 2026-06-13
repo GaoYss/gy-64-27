@@ -13,6 +13,7 @@ class InMemoryStore:
             "projects": count(4),
             "procurements": count(4),
             "inspections": count(4),
+            "payments": count(4),
         }
         self.customers: list[dict[str, Any]] = [
             {
@@ -102,6 +103,7 @@ class InMemoryStore:
                 "expected_finish": str(today + timedelta(days=57)),
                 "risk_level": "low",
                 "latest_update": "Demolition area protected, waste removal booked.",
+                "budget": 180000,
             },
             {
                 "id": 2,
@@ -114,6 +116,7 @@ class InMemoryStore:
                 "expected_finish": str(today + timedelta(days=36)),
                 "risk_level": "medium",
                 "latest_update": "Bathroom waterproofing needs second inspection.",
+                "budget": 350000,
             },
             {
                 "id": 3,
@@ -126,6 +129,7 @@ class InMemoryStore:
                 "expected_finish": str(today + timedelta(days=12)),
                 "risk_level": "low",
                 "latest_update": "Cabinet installation completed.",
+                "budget": 420000,
             },
         ]
         self.procurements: list[dict[str, Any]] = [
@@ -198,6 +202,35 @@ class InMemoryStore:
                 "issues": "One cabinet door gap exceeds tolerance.",
             },
         ]
+        self.payments: list[dict[str, Any]] = [
+            {
+                "id": 1,
+                "project_id": 1,
+                "project_name": "North Star Residence Renovation",
+                "amount": 54000,
+                "payment_date": str(today - timedelta(days=2)),
+                "status": "received",
+                "notes": "30% down payment",
+            },
+            {
+                "id": 2,
+                "project_id": 2,
+                "project_name": "Central Park Apartment",
+                "amount": 175000,
+                "payment_date": str(today - timedelta(days=20)),
+                "status": "received",
+                "notes": "50% first installment",
+            },
+            {
+                "id": 3,
+                "project_id": 3,
+                "project_name": "Harbor Loft",
+                "amount": 336000,
+                "payment_date": str(today - timedelta(days=10)),
+                "status": "received",
+                "notes": "80% milestone payment",
+            },
+        ]
 
     def list_items(self, collection: str) -> list[dict[str, Any]]:
         return deepcopy(getattr(self, collection))
@@ -216,11 +249,43 @@ class InMemoryStore:
                 return deepcopy(updated)
         return None
 
+    def project_cost_summary(self) -> list[dict[str, Any]]:
+        summary = []
+        for project in self.projects:
+            procurement_total = sum(
+                item["budget"] for item in self.procurements if item["project_id"] == project["id"]
+            )
+            payment_received = sum(
+                item["amount"]
+                for item in self.payments
+                if item["project_id"] == project["id"] and item["status"] == "received"
+            )
+            gross_profit = project["budget"] - procurement_total
+            gross_margin = round((gross_profit / project["budget"] * 100), 2) if project["budget"] > 0 else 0.0
+            summary.append(
+                {
+                    "project_id": project["id"],
+                    "project_name": project["project_name"],
+                    "customer_name": project["customer_name"],
+                    "budget": project["budget"],
+                    "procurement_total": procurement_total,
+                    "payment_received": payment_received,
+                    "gross_profit": gross_profit,
+                    "gross_margin": gross_margin,
+                }
+            )
+        return summary
+
     def summary(self) -> dict[str, Any]:
         active_projects = [project for project in self.projects if project["progress"] < 100]
         procurement_budget = sum(item["budget"] for item in self.procurements)
         pending_inspections = sum(1 for item in self.inspections if item["result"] == "pending")
         avg_progress = round(sum(project["progress"] for project in self.projects) / len(self.projects))
+        total_budget = sum(project["budget"] for project in self.projects)
+        total_payments = sum(item["amount"] for item in self.payments if item["status"] == "received")
+        total_procurement = sum(item["budget"] for item in self.procurements)
+        total_gross_profit = total_budget - total_procurement
+        overall_margin = round((total_gross_profit / total_budget * 100), 2) if total_budget > 0 else 0.0
 
         return {
             "generated_at": datetime.now().isoformat(timespec="seconds"),
@@ -231,6 +296,14 @@ class InMemoryStore:
                 {"label": "Pending inspections", "value": pending_inspections, "trend": "Quality follow-up"},
             ],
             "procurement_budget": procurement_budget,
+            "financial_summary": {
+                "total_budget": total_budget,
+                "total_procurement": total_procurement,
+                "total_payments_received": total_payments,
+                "total_gross_profit": total_gross_profit,
+                "overall_margin": overall_margin,
+            },
+            "project_costs": self.project_cost_summary(),
             "phase_distribution": [
                 {"phase": phase, "count": sum(1 for project in self.projects if project["phase"] == phase)}
                 for phase in sorted({project["phase"] for project in self.projects})
